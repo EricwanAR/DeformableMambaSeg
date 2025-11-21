@@ -13,6 +13,7 @@ parser.add_argument('--dir', default='../NII/external', type=str)
 parser.add_argument('--output', default='./test/infer', type=str)
 parser.add_argument('--image_size', default=128, type=int)
 parser.add_argument('--load', type=str)
+parser.add_argument('--skip_exist', default=False, action='store_true')
 args = parser.parse_args()
 
 
@@ -21,6 +22,9 @@ def infer(model, img_dir, output_dir, roi_dict):
     os.makedirs(output_dir, exist_ok=True)
 
     for path in tqdm(paths):
+        output_path = os.path.join(output_dir, os.path.basename(path))
+        if args.skip_exist and os.path.isfile(output_path):
+            continue
         roi = roi_dict[os.path.basename(path)]
         image = sitk.ReadImage(path)
         array = sitk.GetArrayFromImage(image)
@@ -41,7 +45,7 @@ def infer(model, img_dir, output_dir, roi_dict):
         map.SetDirection(image.GetDirection())
         map.SetSpacing(image.GetSpacing())
     
-        sitk.WriteImage(map, os.path.join(output_dir, os.path.basename(path)))
+        sitk.WriteImage(map, output_path)
 
 
 if __name__ == '__main__':

@@ -21,8 +21,8 @@ def fit_skeleton(mask, label, length):
     # 骨架化
     skeleton = morphology.skeletonize(binary_mask)
     
-    for i in range(endpoints.shape[0]):
-        d, h, w = endpoints[i]
+    for point in endpoints:
+        d, h, w = point
         skeleton[d, h, w] = True
 
     # 提取骨架点
@@ -93,7 +93,7 @@ def normalize_coords(coords, size):
 def GetCenterLinePoints(seg):
     mask = seg.cpu().numpy()
     uniq_label = np.unique(mask)
-    length_dict = {1: 20, 2: 20, 3: 20, 4: 20, 5: 40, 6: 40, 7: 60, 8: 60, 9: 40, 10: 20}
+    length_dict = {1: 20, 2: 20, 3: 23, 4: 26, 5: 33, 6: 46, 7: 60, 8: 46, 9: 35, 10: 25}
     
     def process_label(label):
         if label > 10:
@@ -187,7 +187,8 @@ class AIO_aug_and_post_proc(object):
         self.final_size = final_size
         self.device = aug_device
 
-    def __call__(self, image, label, ori_size) -> torch.Any:
+    @torch.no_grad()
+    def __call__(self, image: torch.Tensor, label: torch.Tensor, ori_size) -> torch.Any:
         image = image.unsqueeze(0).float().to(self.device)
         label = label.unsqueeze(0).unsqueeze(0).float().to(self.device)
 

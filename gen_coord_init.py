@@ -49,7 +49,7 @@ def normalize_coords(coords, size):
 
 
 def process_mask(mask):
-    length_dict = {1: 20, 2: 20, 3: 20, 4: 20, 5: 40, 6: 40, 7: 60, 8: 60, 9: 40, 10: 20}
+    length_dict = {1: 20, 2: 20, 3: 23, 4: 26, 5: 33, 6: 46, 7: 60, 8: 46, 9: 35, 10: 25}
     results = []
     for label in range(1, 21):
         if label == 0:

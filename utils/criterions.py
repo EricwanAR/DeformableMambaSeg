@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from scipy.optimize import linear_sum_assignment
 from monai.metrics.surface_dice import compute_surface_dice
+from monai.metrics.hausdorff_distance import compute_hausdorff_distance
+from .cldice import soft_cldice
 
 
 class BipartiteEuclideanLoss(nn.Module):
@@ -182,5 +184,31 @@ class CombinedLoss(nn.Module):
 
         # Combined Loss
         combined_loss = CE_loss*self.ce_weight + dice_loss*self.dice_weight
+
+        return combined_loss
+
+
+class CombinedMoreLoss(nn.Module):
+    def __init__(self, dice_weight=0.5, ce_weight=0.5, cldice_weight=0.5, dice_exp=2):
+        super(CombinedMoreLoss, self).__init__()
+        self.dice_weight = dice_weight
+        self.ce_weight = ce_weight
+        self.cldice_weight = cldice_weight
+        self.dice_loss = DiceLoss(exp=dice_exp)
+        self.cldice_loss = soft_cldice() 
+
+    def forward(self, input, target):
+
+        # Cross-Entropy Loss
+        CE_loss = custom_ce_loss(input, target, input.size(1))
+
+        # Dice Loss
+        dice_loss = self.dice_loss(input, target)
+
+        # CLDice Loss
+        cldice_loss = self.cldice_loss(input[:, 1:, :, :, :].sum(dim=1, keepdim=True), (target > 0).unsqueeze(1).float())
+
+        # Combined Loss
+        combined_loss = CE_loss*self.ce_weight + dice_loss*self.dice_weight + cldice_loss*self.cldice_weight
 
         return combined_loss

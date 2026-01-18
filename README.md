@@ -55,7 +55,7 @@ If you use this dataset or code in your research, please cite our paper:
   author={Wang, Senmao and Gong, Haifan and Cui, Runmeng and Wan, Boyao and Hu, Zhonglin and Yang, Haiqing and Zhou, Jingyang and Jiang, Haiyue and Lin, Lin},
   journal={Expert Systems with Applications},
   pages={130085},
-```  
   year={2025},
   publisher={Elsevier}
 }
+```  
